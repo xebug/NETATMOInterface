@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular-route.js"></script>
+  <script src="app/controllers/controller.js"></script>
+  <script src="app/services/service.js"></script>
+  <script src="app/app.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Demo Netatmo">
+  <meta name="author" content="Michael Rassu">
+
+  <title>Demo Netatmo</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+  <div class="container" ng-app="MonAppli">
+    <div class="main" ng-controller="MonCont">
+      <!-- Navigation -->
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+        <div class="container">
+          <a class="navbar-brand" href="https://dev.netatmo.com/">Netatmo</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <a class="nav-link" ng-click="bandPrincipal()">Accueil</a>
+              <li class="nav-item">
+                <a class="nav-link" ng-click="bandContact()">A propos</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <span class="bandeauPrincipal" id="bandeau" ng-show="bandeauPrincipal">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12 text-center">
+              <h1 class="mt-5">Recherchez une ville et obtenez la temperature locale !</h1>
+              <nav class="navbar navbar-expand-lg navbar-light bg-light navbar-custom">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                  <ul class="navbar-nav mr-auto ml-auto">
+                    <li class="nav-item">
+                      <div class="justify-content-md-center">
+                        <span class="bandeauSearch" id="bandeau2" ng-show="bandeauSearch">
+                          <form class="form-inline my-2 my-lg-0 my-lg-0" ng-submit="searchCity()">
+                            <input class="form-control mr-sm-2" id='city' type="text" placeholder="Paris..." aria-label="Search" style="width: 600px;" ng-model="citySearched">
+                            <button class="btn btn-info my-2 my-sm-0" type="submit">Recherche</button>
+                          </form>
+                        </span>
+                      </div>
+                      <span class="bandeauRes" id="bandeau4" ng-show="bandeauRes">
+                        <div class="alert alert-success" role="alert">{{temperature}}</div>
+                        <div class="d-block mx-auto text-center">
+                          <div class="btn-group-vertical">
+                            <form class="form-inline my-2 my-lg-0 my-lg-0" ng-submit="newResearch()">
+                              <button class="btn btn-info my-2 my-sm-0" type="submit">Nouvelle recherche</button>
+                          </div>
+                        </div>
+                      </span>
+
+                      <span class="bandeauChargement" id="bandeau3" ng-show="bandeauChargement">
+                        <div class="alert alert-warning" role="alert">{{message}}</div>
+
+                      </span>
+                      <span class="bandeauMessage" id="bandeau5" ng-show="bandeauMessage">
+                        <div class="alert alert-danger" role="alert">{{message}}</div>
+                        <div class="d-block mx-auto text-center">
+                          <div class="btn-group-vertical">
+                            <form class="form-inline my-2 my-lg-0 my-lg-0" ng-submit="newResearch()">
+                              <button class="btn btn-info my-2 my-sm-0" type="submit">Nouvelle recherche</button>
+                          </div>
+                        </div>
+                      </span>
+
+                    </li>
+                  </ul>
+                </div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </span>
+      <span class="bandeauContact" id="bandeau" ng-show="bandeauContact">
+        <div class="container">
+          <div class="container-fluid">
+            <h1 class="mt-4">Demo Interface en utilisant l'API Netatmo</h1>
+            <p>Technologies utilisées : Bootstrap,AngularJS,NodeJS,ExpressJS</p>
+            <p>Autre API utilisée: <a class="navbar-brand" href="https://opencagedata.com/api">Opencagedata</a></p>
+            <p>Lors de la recherche d'une ville, les coordonnées sont retournées par l'API Opencagedata.</p>
+            <p>Une requête est alors faites avec ces coordonnées vers l'API Netatmo qui renvoie alors tous les devices présent dans cette zones.</p>
+            <p>A l'aide d'une boucle je selectionne uniquement les modules mesurant la température et fais la moyenne de tous les résultats obtenus.</p>
+          </div>
+        </div>
+    </div>
+    </span>
+
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.slim.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <div id="footer">
+      <div class="container text-center">
+        <p class="text-muted credit" style="color:#fff">Demo par Michael Rassu</p>
+      </div>
+    </div>
+</body>
+
+</html>

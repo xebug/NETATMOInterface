@@ -1,0 +1,107 @@
+
+/******** Chargement des Middleware *******/
+const express = require('express'); // définit expressJS
+const sha1 = require('sha1');	// Pour les mots de passe
+const session = require('express-session');	//Gestionnaire de session
+const pgClient = require('pg');		//Base de donnée postgreSQL
+const MongoDBStore = require('connect-mongodb-session')(session);	//Base de donnée MongoDB
+
+
+
+/******** Declaration des variables ********/
+const app = express(); // appel à expressJS
+var path = require('path');
+app.use(express.static(__dirname + '/interface/')); // Chemin du projet
+
+
+/******** Utilisation de mongodb pour la session des utilisateurs ********/
+
+app.use(session({
+	secret: 'ma phrase secrete',
+	saveUninitialized: false,
+	resave: false,
+	store: new MongoDBStore({
+		uri: "mongodb://127.0.0.1:27017/db",
+		collection: 'mySession_3201',
+		touchAfter: 24 * 3600
+	}),
+	cookie: {
+		maxAge: 24 * 3600 * 1000
+	}
+}));
+
+/******** Utilisation de postgreSQL  ********/
+
+var pool = new pgClient.Pool({
+	user: 'uapv1604417',
+	host: '127.0.0.1',
+	database: 'etd',
+	password: 'ixdyaz',
+	port: 5432
+});
+
+
+
+
+/******** Configuration du serveur NodeJS - Port : 3201 ********/
+var server=app.listen(3201, function()
+  { //Spécification du port d’écoute de Node pour les requêtes HTTP
+    console.log('listening on 3201'); // Message dans la console Node
+  });
+
+
+/******** Chargerment de la page index à l'acces au site ********/
+app.get('/', function(req, res)
+{
+  res.sendFile(path.join(__dirname + '/interface/index.html'));
+});
+
+/******** Fonction qui s'execute a l'acces de /login ********/
+
+app.get('/login', function(req, res) {
+	console.log('Login: ', req.query.login, " mdp: ", req.query.mdp);
+	/******** CONNECTION A LA BDD postgreSQL ********/
+	sql= "select * from fredouil.users where identifiant='" + req.query.login + "';";
+	pool.connect(function(err, client, done) {
+		if(err) {console.log('Error connecting to pg server' + err.stack);}
+		else{
+		console.log('Connection established with pg db server');
+		};
+		client.query(sql, function(err, result){
+			var responseData = {};
+			console.log("result: ", result, "mdp: ", sha1(req.query.mdp))
+			if(err) {
+				console.log('Erreur d’exécution de la requete' + err.stack);
+			} else if ((result.rows[0] != null) && (result.rows[0].motpasse == sha1(req.query.mdp))) {
+				console.log("mot de passe correct");
+
+				/******** on recupere les informations ********/
+				req.session.isConnected = true;
+				req.session.username = req.query.login;
+				req.session.name = result.rows[0].nom;
+				req.session.firstName = result.rows[0].prenom;
+				req.session.id = result.rows[0].id;
+
+				responseData.name=result.rows[0].nom;
+				responseData.username = req.query.login;
+				responseData.firstName = result.rows[0].prenom;
+				responseData.statusMsg='Connexion réussie : bonjour ' + result.rows[0].prenom;
+				
+
+			}
+			else
+			{
+				console.log('Connexion échouée : informations de connexion incorrecte');
+				responseData.statusMsg='Connexion échouée : informations de connexion incorrecte';
+			}
+			res.send(responseData);
+		});
+		client.release();
+	});
+});
+
+app.get('/logout', function(req, res) {
+	//req.session.destroy();
+	console.log("Deconnection...");
+	res.send('/');
+});
